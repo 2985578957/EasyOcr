@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using ShareX.ScreenCaptureLib;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -13,13 +20,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Windows.Forms;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using ShareX.ScreenCaptureLib;
 using TrOCR.Helper;
 using ZXing;
 using ZXing.Common;
@@ -367,61 +367,6 @@ namespace TrOCR
 			RichBoxBody.Focus();
 			RichBoxBody.richTextBox1.Paste();
 		}
-        
-		public void OCR_Tencent()
-		{
-			try
-			{
-				split_txt = "";
-				var image = image_screen;
-				if (image.Width > 90 && image.Height < 90)
-				{
-					var bitmap = new Bitmap(image.Width, 300);
-					var graphics = Graphics.FromImage(bitmap);
-					graphics.DrawImage(image, 5, 0, image.Width, image.Height);
-					graphics.Save();
-					graphics.Dispose();
-					image = new Bitmap(bitmap);
-				}
-				else if (image.Width <= 90 && image.Height >= 90)
-				{
-					var bitmap2 = new Bitmap(300, image.Height);
-					var graphics2 = Graphics.FromImage(bitmap2);
-					graphics2.DrawImage(image, 0, 5, image.Width, image.Height);
-					graphics2.Save();
-					graphics2.Dispose();
-					image = new Bitmap(bitmap2);
-				}
-				else if (image.Width < 90 && image.Height < 90)
-				{
-					var bitmap3 = new Bitmap(300, 300);
-					var graphics3 = Graphics.FromImage(bitmap3);
-					graphics3.DrawImage(image, 5, 5, image.Width, image.Height);
-					graphics3.Save();
-					graphics3.Dispose();
-					image = new Bitmap(bitmap3);
-				}
-				else
-				{
-					image = image_screen;
-				}
-                var value = OcrHelper.TxOcr(image);
-				var jArray = JArray.Parse(((JObject)JsonConvert.DeserializeObject(value))["data"]["item_list"].ToString());
-				checked_txt(jArray, 1, "itemstring");
-			}
-			catch
-			{
-				if (esc != "退出")
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-				}
-				else
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-					esc = "";
-				}
-			}
-		}
 
 		public void OCR_baidu_bak()
 		{
@@ -498,107 +443,10 @@ namespace TrOCR
 			}
 		}
 
-		private void OCR_sougou_Click(object sender, EventArgs e)
-		{
-			OCR_foreach("搜狗");
-		}
-
-		private void OCR_tencent_Click(object sender, EventArgs e)
-		{
-			OCR_foreach("腾讯");
-		}
-
 		private void OCR_baidu_Click(object sender, EventArgs e)
 		{
 		}
 
-		public void OCR_youdao()
-		{
-			try
-			{
-				split_txt = "";
-				var image = image_screen;
-				if (image.Width > 90 && image.Height < 90)
-				{
-					var bitmap = new Bitmap(image.Width, 200);
-					var graphics = Graphics.FromImage(bitmap);
-					graphics.DrawImage(image, 5, 0, image.Width, image.Height);
-					graphics.Save();
-					graphics.Dispose();
-					image = new Bitmap(bitmap);
-				}
-				else if (image.Width <= 90 && image.Height >= 90)
-				{
-					var bitmap2 = new Bitmap(200, image.Height);
-					var graphics2 = Graphics.FromImage(bitmap2);
-					graphics2.DrawImage(image, 0, 5, image.Width, image.Height);
-					graphics2.Save();
-					graphics2.Dispose();
-					image = new Bitmap(bitmap2);
-				}
-				else if (image.Width < 90 && image.Height < 90)
-				{
-					var bitmap3 = new Bitmap(200, 200);
-					var graphics3 = Graphics.FromImage(bitmap3);
-					graphics3.DrawImage(image, 5, 5, image.Width, image.Height);
-					graphics3.Save();
-					graphics3.Dispose();
-					image = new Bitmap(bitmap3);
-				}
-				else
-				{
-					image = image_screen;
-				}
-				var i = image.Width;
-				var j = image.Height;
-				if (i < 600)
-				{
-					while (i < 600)
-					{
-						j *= 2;
-						i *= 2;
-					}
-				}
-				if (j < 120)
-				{
-					while (j < 120)
-					{
-						j *= 2;
-						i *= 2;
-					}
-				}
-				var bitmap4 = new Bitmap(i, j);
-				var graphics4 = Graphics.FromImage(bitmap4);
-				graphics4.DrawImage(image, 0, 0, i, j);
-				graphics4.Save();
-				graphics4.Dispose();
-				image = new Bitmap(bitmap4);
-				var inArray = OcrHelper.ImgToBytes(image);
-				var data = "imgBase=data" + HttpUtility.UrlEncode(":image/jpeg;base64," + Convert.ToBase64String(inArray)) + "&lang=auto&company=";
-				var value = CommonHelper.PostStrData("http://aidemo.youdao.com/ocrapi1", data, "",
-                    "http://aidemo.youdao.com/ocrdemo");
-				var jArray = JArray.Parse(((JObject)JsonConvert.DeserializeObject(value))["lines"].ToString());
-				checked_txt(jArray, 1, "words");
-				image.Dispose();
-			}
-			catch
-			{
-				if (esc != "退出")
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-				}
-				else
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-					esc = "";
-				}
-			}
-		}
-
-		public void OCR_youdao_Click(object sender, EventArgs e)
-		{
-			OCR_foreach("有道");
-		}
 
 		public void change_Chinese_Click(object sender, EventArgs e)
 		{
@@ -643,8 +491,8 @@ namespace TrOCR
 			interface_flag = IniHelper.GetValue("配置", "接口");
 			if (interface_flag == "发生错误")
 			{
-				IniHelper.SetValue("配置", "接口", "搜狗");
-				OCR_foreach("搜狗");
+				IniHelper.SetValue("配置", "接口", "中英");
+				OCR_foreach("中英");
 			}
 			else
 			{
@@ -888,17 +736,9 @@ namespace TrOCR
 					StaticValue.ZH2KO = false;
 					RichBoxBody_T.set_language = "中英";
 				}
-				if (IniHelper.GetValue("配置", "翻译接口") == "谷歌")
-				{
-					googleTranslate_txt = Translate_Google(typeset_txt);
-				}
 				if (IniHelper.GetValue("配置", "翻译接口") == "百度")
 				{
 					googleTranslate_txt = TranslateBaidu(typeset_txt);
-				}
-				if (IniHelper.GetValue("配置", "翻译接口") == "腾讯")
-				{
-					googleTranslate_txt = Translate_Tencent(typeset_txt);
 				}
 			}
 			PictureBox1.Visible = false;
@@ -1697,27 +1537,7 @@ namespace TrOCR
 				Invoke(new OcrThread(Main_OCR_Thread_last));
 				return;
 			}
-			if (interface_flag == "搜狗")
-			{
-				SougouOCR();
-				fmloading.FmlClose = "窗体已关闭";
-				Invoke(new OcrThread(Main_OCR_Thread_last));
-				return;
-			}
-			if (interface_flag == "腾讯")
-			{
-				OCR_Tencent();
-				fmloading.FmlClose = "窗体已关闭";
-				Invoke(new OcrThread(Main_OCR_Thread_last));
-				return;
-			}
-			if (interface_flag == "有道")
-			{
-				OCR_youdao();
-				fmloading.FmlClose = "窗体已关闭";
-				Invoke(new OcrThread(Main_OCR_Thread_last));
-				return;
-			}
+
 			if (interface_flag == "公式")
 			{
 				OCR_Math();
@@ -1728,13 +1548,6 @@ namespace TrOCR
 			if (interface_flag == "百度表格")
 			{
 				BdTableOCR();
-				fmloading.FmlClose = "窗体已关闭";
-				Invoke(new OcrThread(Main_OCR_Thread_table));
-				return;
-			}
-			if (interface_flag == "阿里表格")
-			{
-				OCR_ali_table();
 				fmloading.FmlClose = "窗体已关闭";
 				Invoke(new OcrThread(Main_OCR_Thread_table));
 				return;
@@ -1877,7 +1690,6 @@ namespace TrOCR
 			WindowState = FormWindowState.Normal;
 			Size = new Size(form_width, form_height);
 			HelpWin32.SetForegroundWindow(Handle);
-			StaticValue.v_googleTranslate_txt = RichBoxBody.Text;
 			if (bool.Parse(IniHelper.GetValue("工具栏", "翻译")))
 			{
 				try
@@ -2041,149 +1853,6 @@ namespace TrOCR
 				}
 			}
 			return new string(array);
-		}
-
-		public string OCR_sougou_SogouPost(string url, CookieContainer cookie, byte[] content)
-		{
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-			httpWebRequest.Method = "POST";
-			httpWebRequest.CookieContainer = cookie;
-			httpWebRequest.Timeout = 10000;
-			httpWebRequest.Referer = "http://pic.sogou.com/resource/pic/shitu_intro/index.html";
-			httpWebRequest.ContentType = "multipart/form-data; boundary=----WebKitFormBoundary1ZZDB9E4sro7pf0g";
-			httpWebRequest.Accept = "*/*";
-			httpWebRequest.Headers.Add("Origin: http://pic.sogou.com");
-			httpWebRequest.Headers.Add("Accept-Encoding: gzip,deflate");
-			httpWebRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)";
-			httpWebRequest.ServicePoint.Expect100Continue = false;
-			httpWebRequest.ProtocolVersion = new Version(1, 1);
-			httpWebRequest.ContentLength = content.Length;
-			var requestStream = httpWebRequest.GetRequestStream();
-			requestStream.Write(content, 0, content.Length);
-			requestStream.Close();
-			string result;
-			try
-			{
-                var text = "";
-                using (var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse())
-				{
-					var stream = httpWebResponse.GetResponseStream();
-					if (httpWebResponse.ContentEncoding.ToLower().Contains("gzip"))
-					{
-						stream = new GZipStream(stream, CompressionMode.Decompress);
-					}
-					using (var streamReader = new StreamReader(stream, Encoding.UTF8))
-					{
-						text = streamReader.ReadToEnd();
-						streamReader.Close();
-						httpWebResponse.Close();
-					}
-				}
-				result = text;
-			}
-			catch
-			{
-				result = null;
-			}
-			return result;
-		}
-
-		public string OCR_sougou_SogouGet(string url, CookieContainer cookie, string refer)
-		{
-			var text = "";
-			var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-			httpWebRequest.Method = "GET";
-			httpWebRequest.CookieContainer = cookie;
-			httpWebRequest.Referer = refer;
-			httpWebRequest.Timeout = 10000;
-			httpWebRequest.Accept = "application/json";
-			httpWebRequest.Headers.Add("X-Requested-With: XMLHttpRequest");
-			httpWebRequest.Headers.Add("Accept-Encoding: gzip,deflate");
-			httpWebRequest.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-			httpWebRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)";
-			httpWebRequest.ServicePoint.Expect100Continue = false;
-			httpWebRequest.ProtocolVersion = new Version(1, 1);
-			string result;
-			try
-			{
-				using (var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse())
-				{
-					var stream = httpWebResponse.GetResponseStream();
-					if (httpWebResponse.ContentEncoding.ToLower().Contains("gzip"))
-					{
-						stream = new GZipStream(stream, CompressionMode.Decompress);
-					}
-					using (var streamReader = new StreamReader(stream, Encoding.UTF8))
-					{
-						text = streamReader.ReadToEnd();
-						streamReader.Close();
-						httpWebResponse.Close();
-					}
-				}
-				result = text;
-			}
-			catch
-			{
-				result = null;
-			}
-			return result;
-		}
-
-		public string OCR_sougou_SogouOCR(Image img)
-		{
-			var cookie = new CookieContainer();
-			var url = "http://pic.sogou.com/pic/upload_pic.jsp";
-			var str = OCR_sougou_SogouPost(url, cookie, OCR_sougou_Content_Length(img));
-			var url2 = "http://pic.sogou.com/pic/ocr/ocrOnline.jsp?query=" + str;
-			var refer = "http://pic.sogou.com/resource/pic/shitu_intro/word_1.html?keyword=" + str;
-			return OCR_sougou_SogouGet(url2, cookie, refer);
-		}
-
-		
-
-		public byte[] OCR_sougou_Content_Length(Image img)
-		{
-			var bytes = Encoding.UTF8.GetBytes("------WebKitFormBoundary1ZZDB9E4sro7pf0g\r\nContent-Disposition: form-data; name=\"pic_path\"; filename=\"test2018.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n");
-			var array = OcrHelper.ImgToBytes(img);
-			var bytes2 = Encoding.UTF8.GetBytes("\r\n------WebKitFormBoundary1ZZDB9E4sro7pf0g--\r\n");
-			var array2 = new byte[bytes.Length + array.Length + bytes2.Length];
-			bytes.CopyTo(array2, 0);
-			array.CopyTo(array2, bytes.Length);
-			bytes2.CopyTo(array2, bytes.Length + array.Length);
-			return array2;
-		}
-
-		public void SougouOCR()
-		{
-			try
-			{
-				split_txt = "";
-				Image image = ZoomImage((Bitmap)image_screen, 120, 120);
-                //var value = OcrHelper.SgOcr(image);
-                var value = OcrHelper.SgBasicOpenOcr(image);
-				var jArray = JArray.Parse(((JObject)JsonConvert.DeserializeObject(value))["result"].ToString());
-				if (IniHelper.GetValue("工具栏", "分段") == "True")
-				{
-					checked_location_sougou(jArray, 2, "content", "frame");
-				}
-				else
-				{
-					checked_txt(jArray, 2, "content");
-				}
-				image.Dispose();
-			}
-			catch
-			{
-				if (esc != "退出")
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-				}
-				else
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-					esc = "";
-				}
-			}
 		}
 
 		public static byte[] MergeByte(byte[] a, byte[] b, byte[] c)
@@ -2360,21 +2029,6 @@ namespace TrOCR
                     baidu.Text = "百度√";
                     ch_en.Text = "中英√";
                     break;
-                case "搜狗":
-                    interface_flag = "搜狗";
-                    Refresh();
-                    sougou.Text = "搜狗√";
-                    break;
-                case "腾讯":
-                    interface_flag = "腾讯";
-                    Refresh();
-                    tencent.Text = "腾讯√";
-                    break;
-                case "有道":
-                    interface_flag = "有道";
-                    Refresh();
-                    youdao.Text = "有道√";
-                    break;
                 case "公式":
                     interface_flag = "公式";
                     Refresh();
@@ -2386,14 +2040,8 @@ namespace TrOCR
                     ocr_table.Text = "表格√";
                     baidu_table.Text = "百度√";
                     break;
-                case "阿里表格":
-                    interface_flag = "阿里表格";
-                    Refresh();
-                    ocr_table.Text = "表格√";
-                    ali_table.Text = "阿里√";
-                    break;
                 case "从左向右" when !File.Exists("cvextern.dll"):
-                    MessageBox.Show("请从蓝奏网盘中下载cvextern.dll大小约25m，点击确定自动弹出网页。\r\n将下载后的文件与 天若OCR文字识别.exe 这个文件放在一起。");
+                    MessageBox.Show("请从蓝奏网盘中下载cvextern.dll大小约25m，点击确定自动弹出网页。\r\n将下载后的文件与 OCR文字识别.exe 这个文件放在一起。");
                     Process.Start("https://www.lanzous.com/i1ab3vg");
                     break;
                 case "从左向右":
@@ -2403,7 +2051,7 @@ namespace TrOCR
                     left_right.Text = "从左向右√";
                     break;
                 case "从右向左" when !File.Exists("cvextern.dll"):
-                    MessageBox.Show("请从蓝奏网盘中下载cvextern.dll大小约25m，点击确定自动弹出网页。\r\n将下载后的文件与 天若OCR文字识别.exe 这个文件放在一起。");
+                    MessageBox.Show("请从蓝奏网盘中下载cvextern.dll大小约25m，点击确定自动弹出网页。\r\n将下载后的文件与 OCR文字识别.exe 这个文件放在一起。");
                     Process.Start("https://www.lanzous.com/i1ab3vg");
                     return;
                 case "从右向左":
@@ -2485,62 +2133,6 @@ namespace TrOCR
 				esc = "退出";
 				fmloading.FmlClose = "窗体已关闭";
 				esc_thread.Abort();
-			}
-		}
-
-		public void OCR_Tencent_handwriting()
-		{
-			try
-			{
-				split_txt = "";
-				var image = image_screen;
-				if (image.Width > 90 && image.Height < 90)
-				{
-					var bitmap = new Bitmap(image.Width, 300);
-					var graphics = Graphics.FromImage(bitmap);
-					graphics.DrawImage(image, 5, 0, image.Width, image.Height);
-					graphics.Save();
-					graphics.Dispose();
-					image = new Bitmap(bitmap);
-				}
-				else if (image.Width <= 90 && image.Height >= 90)
-				{
-					var bitmap2 = new Bitmap(300, image.Height);
-					var graphics2 = Graphics.FromImage(bitmap2);
-					graphics2.DrawImage(image, 0, 5, image.Width, image.Height);
-					graphics2.Save();
-					graphics2.Dispose();
-					image = new Bitmap(bitmap2);
-				}
-				else if (image.Width < 90 && image.Height < 90)
-				{
-					var bitmap3 = new Bitmap(300, 300);
-					var graphics3 = Graphics.FromImage(bitmap3);
-					graphics3.DrawImage(image, 5, 5, image.Width, image.Height);
-					graphics3.Save();
-					graphics3.Dispose();
-					image = new Bitmap(bitmap3);
-				}
-				else
-				{
-					image = image_screen;
-				}
-                var url = "https://ai.qq.com/cgi-bin/appdemo_handwritingocr";
-                var value = OcrHelper.TxComm(image, url);
-				var jArray = JArray.Parse(((JObject)JsonConvert.DeserializeObject(value))["data"]["item_list"].ToString());
-				checked_txt(jArray, 1, "itemstring");
-			}
-			catch
-			{
-				if (esc != "退出")
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-				}
-				else
-				{
-					RichBoxBody.Text = "***该区域未发现文本***";
-					esc = "";
-				}
 			}
 		}
 
@@ -3190,17 +2782,9 @@ namespace TrOCR
 				try
 				{
 					trans_hotkey = GetTextFromClipboard();
-					if (IniHelper.GetValue("配置", "翻译接口") == "谷歌")
-					{
-						data = Translate_Google(trans_hotkey);
-					}
 					if (IniHelper.GetValue("配置", "翻译接口") == "百度")
 					{
 						data = TranslateBaidu(trans_hotkey);
-					}
-					if (IniHelper.GetValue("配置", "翻译接口") == "腾讯")
-					{
-						data = Translate_Tencent(trans_hotkey);
 					}
 					Clipboard.SetData(DataFormats.UnicodeText, data);
 					SendKeys.SendWait("^v");
@@ -3335,18 +2919,6 @@ namespace TrOCR
 				messageload.ShowDialog();
 				if (messageload.DialogResult == DialogResult.OK)
 				{
-					if (interface_flag == "搜狗")
-					{
-						SougouOCR();
-					}
-					if (interface_flag == "腾讯")
-					{
-						OCR_Tencent();
-					}
-					if (interface_flag == "有道")
-					{
-						OCR_youdao();
-					}
 					if (interface_flag == "日语" || interface_flag == "中英" || interface_flag == "韩语")
 					{
 						OCR_baidu();
@@ -3546,11 +3118,6 @@ namespace TrOCR
 			return num;
 		}
 
-		public void Trans_google_Click(object sender, EventArgs e)
-		{
-			Trans_foreach("谷歌");
-		}
-
 		public void Trans_baidu_Click(object sender, EventArgs e)
 		{
 			Trans_foreach("百度");
@@ -3561,23 +3128,7 @@ namespace TrOCR
 			if (name == "百度")
 			{
 				trans_baidu.Text = "百度√";
-				trans_google.Text = "谷歌";
-				trans_tencent.Text = "腾讯";
 				IniHelper.SetValue("配置", "翻译接口", "百度");
-			}
-			if (name == "谷歌")
-			{
-				trans_baidu.Text = "百度";
-				trans_google.Text = "谷歌√";
-				trans_tencent.Text = "腾讯";
-				IniHelper.SetValue("配置", "翻译接口", "谷歌");
-			}
-			if (name == "腾讯")
-			{
-				trans_google.Text = "谷歌";
-				trans_baidu.Text = "百度";
-				trans_tencent.Text = "腾讯√";
-				IniHelper.SetValue("配置", "翻译接口", "腾讯");
 			}
 		}
 
@@ -3643,11 +3194,6 @@ namespace TrOCR
 				text = "[百度接口报错]：\r\n1.接口请求出现问题等待修复。";
 			}
 			return text;
-		}
-
-		public void Trans_tencent_Click(object sender, EventArgs e)
-		{
-			Trans_foreach("腾讯");
 		}
 
 		public string Content_Length(string text, string from, string to)
@@ -3842,7 +3388,6 @@ namespace TrOCR
 
 		public void Main_OCR_Thread_table()
 		{
-			ailibaba = new AliTable();
 			var timeSpan = new TimeSpan(DateTime.Now.Ticks);
 			var timeSpan2 = timeSpan.Subtract(ts).Duration();
 			var str = string.Concat(new[]
@@ -3878,21 +3423,6 @@ namespace TrOCR
 			WindowState = FormWindowState.Normal;
 			Size = new Size(form_width, form_height);
 			HelpWin32.SetForegroundWindow(Handle);
-			if (interface_flag == "阿里表格")
-			{
-				if (split_txt == "弹出cookie")
-				{
-					split_txt = "";
-					ailibaba.TopMost = true;
-					ailibaba.getcookie = "";
-					IniHelper.SetValue("特殊", "ali_cookie", ailibaba.getcookie);
-					ailibaba.ShowDialog();
-					HelpWin32.SetForegroundWindow(ailibaba.Handle);
-					return;
-				}
-				Clipboard.SetDataObject(typeset_txt);
-				CopyHtmlToClipBoard(typeset_txt);
-			}
 		}
 
 		private void setClipboard_Table(string[,] wordo, int[] cc)
@@ -3996,17 +3526,9 @@ namespace TrOCR
 			OCR_foreach("百度表格");
 		}
 
-		public void OCR_ailitable_Click(object sender, EventArgs e)
-		{
-			OCR_foreach("阿里表格");
-		}
-
 		private new void Refresh()
 		{
-			sougou.Text = "搜狗";
-			tencent.Text = "腾讯";
 			baidu.Text = "百度";
-			youdao.Text = "有道";
 			shupai.Text = "竖排";
 			ocr_table.Text = "表格";
 			ch_en.Text = "中英";
@@ -4015,7 +3537,6 @@ namespace TrOCR
 			left_right.Text = "从左向右";
 			righ_left.Text = "从右向左";
 			baidu_table.Text = "百度";
-			ali_table.Text = "阿里";
 			Mathfuntion.Text = "公式";
 		}
 
@@ -4027,32 +3548,6 @@ namespace TrOCR
 		public static Stream BytesToStream(byte[] bytes)
 		{
 			return new MemoryStream(bytes);
-		}
-
-		public void OCR_ali_table()
-		{
-			var text = "";
-			split_txt = "";
-			try
-			{
-				var value = IniHelper.GetValue("特殊", "ali_cookie");
-				var stream = BytesToStream(ImageToByteArray(BWPic((Bitmap)image_screen)));
-				var str = Convert.ToBase64String(new BinaryReader(stream).ReadBytes(Convert.ToInt32(stream.Length)));
-				stream.Close();
-				var postStr = "{\n\t\"image\": \"" + str + "\",\n\t\"configure\": \"{\\\"format\\\":\\\"html\\\", \\\"finance\\\":false}\"\n}";
-				var url = "https://predict-pai.data.aliyun.com/dp_experience_mall/ocr/ocr_table_parse";
-				text = CommonHelper.PostStrData(url, postStr, value);
-				typeset_txt = ((JObject)JsonConvert.DeserializeObject(CommonHelper.PostStrData(url, postStr, value)))["tables"].ToString().Replace("table tr td { border: 1px solid blue }", "table tr td {border: 0.5px black solid }").Replace("table { border: 1px solid blue }", "table { border: 0.5px black solid; border-collapse : collapse}\r\n");
-				RichBoxBody.Text = "[消息]：表格已复制到粘贴板！";
-			}
-			catch
-			{
-				RichBoxBody.Text = "[消息]：阿里表格识别出错！";
-				if (text.Contains("NEED_LOGIN"))
-				{
-					split_txt = "弹出cookie";
-				}
-			}
 		}
 
 		public Bitmap BWPic(Bitmap mybm)
@@ -4301,8 +3796,6 @@ namespace TrOCR
         private WebBrowser webBrowser;
 
 		public string tencent_cookie;
-
-		private AliTable ailibaba;
 
 		public delegate void Translate();
 

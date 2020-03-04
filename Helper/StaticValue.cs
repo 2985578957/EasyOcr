@@ -12,10 +12,6 @@ namespace TrOCR.Helper
 
         public static string v_Merge;
 
-        public static string v_googleTranslate_txt;
-
-        public static string v_googleTranslate_back;
-
         public static int image_h;
 
         public static int image_w;
@@ -85,7 +81,7 @@ namespace TrOCR.Helper
 			set_截图 = false;
 			DpiFactor = 1f;
 			CurrentVersion = "5.0.1";
-			ReleaseDate = "2019-02-27";
+			ReleaseDate = "2020-03-04";
 		}
 
 		

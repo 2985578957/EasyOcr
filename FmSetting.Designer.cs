@@ -780,7 +780,7 @@
             this.cbBox_开机.Size = new System.Drawing.Size(72, 16);
             this.cbBox_开机.TabIndex = 2;
             this.cbBox_开机.Text = "开机启动";
-            this.cbBox_开机.UseVisualStyleBackColor = true;
+            this.cbBox_开机.UseVisualStyleBackColor = false;
             this.cbBox_开机.CheckedChanged += new System.EventHandler(this.cbBox_开机_CheckedChanged);
             // 
             // tab_标签

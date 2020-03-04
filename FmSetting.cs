@@ -30,7 +30,7 @@ namespace TrOCR
 			var value = IniHelper.GetValue("配置", "开机自启");
 			if (value == "发生错误")
 			{
-				cbBox_开机.Checked = true;
+				cbBox_开机.Checked = false;
 			}
 			try
 			{
@@ -38,7 +38,7 @@ namespace TrOCR
 			}
 			catch
 			{
-				cbBox_开机.Checked = true;
+				cbBox_开机.Checked = false;
 			}
 			var value2 = IniHelper.GetValue("配置", "快速翻译");
 			if (value2 == "发生错误")
@@ -139,13 +139,13 @@ namespace TrOCR
 			text_baiduaccount.Text = value12;
 			if (value12 == "发生错误")
 			{
-				text_baiduaccount.Text = "YsZKG1wha34PlDOPYaIrIIKO";
+				text_baiduaccount.Text = "整个项目中搜索这个字符串替换为你的API Key";
 			}
 			var value13 = IniHelper.GetValue("密钥_百度", "secret_key");
 			text_baidupassword.Text = value13;
 			if (value13 == "发生错误")
 			{
-				text_baidupassword.Text = "HPRZtdOHrdnnETVsZM2Nx7vbDkMfxrkD";
+				text_baidupassword.Text = "整个项目中搜索这个字符串替换为你的Secret Key";
 			}
 			var value14 = IniHelper.GetValue("代理", "代理类型");
 			combox_代理.Text = value14;
@@ -455,8 +455,8 @@ namespace TrOCR
 
 		private void 密钥Button_Click(object sender, EventArgs e)
 		{
-			text_baiduaccount.Text = "YsZKG1wha34PlDOPYaIrIIKO";
-			text_baidupassword.Text = "HPRZtdOHrdnnETVsZM2Nx7vbDkMfxrkD";
+			text_baiduaccount.Text = "整个项目中搜索这个字符串替换为你的API Key";
+			text_baidupassword.Text = "整个项目中搜索这个字符串替换为你的Secret Key";
 		}
 
 		private void folderBrowserDialog1_HelpRequest(object sender, EventArgs e)
@@ -465,7 +465,7 @@ namespace TrOCR
 
 		private void 常规Button_Click(object sender, EventArgs e)
 		{
-			cbBox_开机.Checked = true;
+			cbBox_开机.Checked = false;
 			cbBox_翻译.Checked = true;
 			cbBox_弹窗.Checked = true;
 			cobBox_动画.SelectedIndex = 0;
